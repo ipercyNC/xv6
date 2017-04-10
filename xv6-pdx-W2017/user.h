@@ -24,7 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int halt(void);
-int date(struct rtcdate*);
+int date(struct rtcdate*); // added for Project 1- date prototype
 
 // ulib.c
 int stat(char*, struct stat*);

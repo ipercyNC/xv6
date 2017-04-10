@@ -68,7 +68,7 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-  p->start_ticks=ticks; 
+  p->start_ticks=ticks;  // intialize start_ticks 
   return p;
 }
 
@@ -496,32 +496,43 @@ static char *states[] = {
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.
 void
-printhelper(int x, char * y, char * z, int w)
+printhelper(int pidin, char * statein, char * namein, int ticksin)
 {
- int i,j,diff;
-  i = strlen(y);
-  j = strlen(z);
- if(x>=10)
-   cprintf("%d    ",x);
- else
-   cprintf("%d     ",x); 
- if(i<8){
-  diff = 8-i;
-  cprintf("%s",y);
-  for(i=0;i<diff;i++)
-   cprintf(" ");
- } 
- else 
-  cprintf("%s",y);
- if(j<7){
-   diff= 7-j;
-   cprintf("%s",z);
-   for(i=0;i<diff;i++)
-     cprintf(" ");
- } 
- j = ticks - w;
- cprintf("%d        ",j);
+  int i,statelen,namelen,diff,elapsed,seconds,decimal;
+  statelen = strlen(statein);
+  namelen = strlen(namein);
+  if(pidin>=10) // print pid formatted for size
+    cprintf("%d    ",pidin);
+  else
+    cprintf("%d     ",pidin); 
+  if(statelen<8){ // print state formatted for length
+    diff = 8-statelen;
+    cprintf("%s",statein);
+    for(i=0;i<diff;i++)
+      cprintf(" ");
+  } 
+  else 
+    cprintf("%s",statein);
+  if(namelen<7){ // print name formated for length
+    diff= 7-namelen;
+    cprintf("%s",namein);
+    for(i=0;i<diff;i++)
+      cprintf(" ");
+  } 
+  else
+    cprintf("%s",namein);
+  elapsed = ticks - ticksin; // calculate the time elapsed
+  seconds = elapsed/100;
+  decimal = elapsed%100;
+  if(decimal<10) // print elapsed formatted for length
+    cprintf("%d.0%d    ",seconds,decimal); 
+  else
+    cprintf("%d.%d    ",seconds,decimal);
+  if(seconds<10)
+    cprintf(" ");
 }
+
+
 void 
 procdump(void)
 {
@@ -537,7 +548,7 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-   printhelper(p->pid, state, p->name,p->start_ticks);
+    printhelper(p->pid, state, p->name,p->start_ticks); // call print helper function
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)

@@ -30,4 +30,4 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 SYSCALL(halt)
-SYSCALL(date)
+SYSCALL(date) // Created for Project 1- new syscall for date

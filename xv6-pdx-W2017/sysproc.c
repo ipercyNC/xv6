@@ -100,9 +100,9 @@ sys_date(void)
 {
   struct rtcdate *d;
  
-  if(argptr(0, (void*)&d, sizeof(*d)) <0)
+  if(argptr(0, (void*)&d, sizeof(*d)) <0) // check value from argptr
     return -1;
-  cmostime(d);
+  cmostime(d); // call cmostime() on pointer argument extracted from stack
     
   return 0;  
 }

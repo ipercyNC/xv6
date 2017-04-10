@@ -128,10 +128,15 @@ static int (*syscalls[])(void) = {
 };
 
 // put data structure for printing out system call invocation information here
-#ifdef PRINT_SYSCALLS
 
-const char *syscallnames[]= {"fork",
-"exit","wait","pipe",
+//Conditional compilation for if CFLAGS for PRINT_SYSCALLS is turned on
+#ifdef PRINT_SYSCALLS
+//Array of character arrays for each of the task string representations
+const char *syscallnames[]= {
+"fork",
+"exit",
+"wait",
+"pipe",
 "read",
 "kill",
 "exec",
@@ -153,17 +158,19 @@ const char *syscallnames[]= {"fork",
 "date"
 };
 #endif 
+
+
 void
 syscall(void)
 {
   int num;
-  int temp;
   num = proc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    proc->tf->eax = temp=syscalls[num]();
+    proc->tf->eax = syscalls[num]();
 // some code goes here
   #ifdef PRINT_SYSCALLS 
-    cprintf("%s -> %d\n",syscallnames[num-1], temp);
+    // print the corresponding string and the return value (stored in proc->tf->eax)
+    cprintf("%s -> %d\n",syscallnames[num-1], proc->tf->eax);
   #endif
   } else {
     cprintf("%d %s: unknown sys call %d\n",
